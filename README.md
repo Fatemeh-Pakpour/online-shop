@@ -177,4 +177,5 @@ error; missing tasks return a "not found" error.
 - Add depth/complexity limiting and rate limiting before exposing the API publicly.
 - Add an index on the fields you sort or filter by as the collection grows (`createdAt` is used for
   the default ordering).
+
 # online-shop

@@ -1,0 +1,15 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+allowBuilds:
+  '@apollo/protobufjs': true
+  unrs-resolver: true
+
+minimumReleaseAgeExclude:
+  - mongoose@9.8.1
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild
+  - unrs-resolver
