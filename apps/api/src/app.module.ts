@@ -8,10 +8,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 import { envValidationSchema } from './config/env.validation';
+import { ProductModule } from './products/product.module';
 import { TasksModule } from './tasks/tasks.module';
 
 const isProduction = process.env.NODE_ENV === 'production';
-
+// forRoot() creates the MongoDB connection for your NestJS application
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -36,6 +37,7 @@ const isProduction = process.env.NODE_ENV === 'production';
       }),
     }),
     TasksModule,
+    ProductModule,
   ],
 })
-export class AppModule {}
+export class AppModule { }

@@ -24,7 +24,7 @@ async function bootstrap(): Promise<void> {
     origin: config.getOrThrow<string>('FRONTEND_URL'),
     credentials: true,
   });
-
+  // // Usually unnecessary with Zod
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -33,6 +33,7 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
+  // enables Nest’s shutdown lifecycle.
   app.enableShutdownHooks();
 
   const port = config.get<number>('PORT') ?? 3000;
@@ -40,4 +41,6 @@ async function bootstrap(): Promise<void> {
   console.log(`API ready at http://localhost:${port}/graphql`);
 }
 
+// void Start bootstrap(), but do not await or observe its returned Promise.
+// So the caller does not wait to know whether the Promise is:pending, resolved successfully, rejected with an error
 void bootstrap();

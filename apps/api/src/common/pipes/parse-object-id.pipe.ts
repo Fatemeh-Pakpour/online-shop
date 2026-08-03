@@ -7,7 +7,7 @@ import { isValidObjectId } from 'mongoose';
 export class ParseObjectIdPipe implements PipeTransform<string, string> {
   transform(value: string): string {
     if (!isValidObjectId(value)) {
-      throw new GraphQLError(`"${value}" is not a valid task id.`, {
+      throw new GraphQLError(`"${value}" is not a valid id.`, {
         extensions: { code: 'BAD_USER_INPUT' },
       });
     }
