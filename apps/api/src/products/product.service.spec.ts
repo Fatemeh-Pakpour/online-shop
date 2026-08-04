@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
 import { Types } from 'mongoose';
@@ -29,7 +29,7 @@ const modelMock = {
   create: jest.fn(),
 };
 
-const exec = <T>(value: T) => ({ exec: () => Promise.resolve(value) });
+const exec = <T>(value: T) => ({ exec: Promise.resolve(value) })
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -75,6 +75,11 @@ describe('ProductService', () => {
       { $set: { price: 10 } },
       { new: true, runValidators: true },
     );
+  });
+
+  it('rejects update requests without fields', async () => {
+    await expect(service.update(id.toString(), {})).rejects.toBeInstanceOf(BadRequestException)
+    expect(modelMock.findByIdAndUpdate).not.toHaveBeenCalled()
   });
 
   it('throws NotFoundException when updating a missing product', async () => {

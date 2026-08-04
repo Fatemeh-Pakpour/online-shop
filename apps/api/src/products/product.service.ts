@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -37,6 +37,10 @@ export class ProductService {
     }
 
     async update(id: string, input: UpdateProductInput): Promise<ProductModel> {
+        if (Object.keys(input).length === 0) {
+            throw new BadRequestException('At least one product field must be provided.');
+        }
+
         const product = await this.productModel
             .findByIdAndUpdate(id, { $set: input }, { new: true, runValidators: true })
             .exec();
@@ -54,8 +58,9 @@ export class ProductService {
         // }
         // exec() executes the Mongoose query and returns a real JavaScript Promise.
         // I can use deleteOne becuase I want to return boolean
-        const result = await this.productModel.findByIdAndDelete(id).exec();
-        return result !== null;
+        const product = await this.productModel.findByIdAndDelete(id).exec();
+        this.assertFound(product, id)
+        return true
     }
 
     private assertFound(product: ProductDocument | null, id: string): ProductDocument {

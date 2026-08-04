@@ -1,4 +1,4 @@
-import { NotFoundException } from '@nestjs/common';
+import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test } from '@nestjs/testing';
 import { Types } from 'mongoose';
@@ -6,6 +6,9 @@ import { Types } from 'mongoose';
 import { Task } from './schemas/task.schema';
 import { TasksService } from './tasks.service';
 
+// contains 24 hexadecimal characters
+// can use only 0–9 and a–f
+// is 12 bytes internally
 const id = new Types.ObjectId();
 const now = new Date();
 
@@ -54,12 +57,18 @@ describe('TasksService', () => {
   });
 
   it('throws NotFoundException when updating a missing task', async () => {
+    // Pretend MongoDB was called and did not find any document.
     modelMock.findByIdAndUpdate.mockReturnValue(exec(null));
-
+    // Because service.update() returns a Promise, we cannot use normal toThrow(), “I expect this Promise to fail/reject.”
     await expect(service.update(id.toString(), { title: 'new' })).rejects.toBeInstanceOf(
       NotFoundException,
     );
   });
+  // when the input is empty {} we do not call mangoDB and throw error
+  it('throw BadRequestException as at least one product field must be provided.', async () => {
+    await expect(service.update(id.toString(), {})).rejects.toBeInstanceOf(BadRequestException)
+    expect(modelMock.findByIdAndUpdate).not.toHaveBeenCalled();
+  })
 
   it('flips the completed flag when toggling', async () => {
     const target = { ...doc, completed: false, save: jest.fn().mockResolvedValue(undefined) };

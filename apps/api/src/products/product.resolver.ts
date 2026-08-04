@@ -16,7 +16,8 @@ export class ProductResolver {
     return this.productService.findAll()
   }
 
-  @Query(() => ProductModel, { name: "product" })
+  // becuase the response is null then we need to add nullable in the GraphQL as well
+  @Query(() => ProductModel, { name: "product", nullable: true })
   product(@Args('id', { type: () => ID }, ParseObjectIdPipe) id: string): Promise<ProductModel | null> {
     return this.productService.findOne(id)
   }
@@ -39,7 +40,7 @@ export class ProductResolver {
   }
 
   @Mutation(() => Boolean)
-  removeProduct(@Args('id', { type: () => ID }, ParseObjectIdPipe) id: string): Promise<boolean> {
+  deleteProduct(@Args('id', { type: () => ID }, ParseObjectIdPipe) id: string): Promise<boolean> {
     return this.productService.remove(id)
   }
 
