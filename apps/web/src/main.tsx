@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import App from './App';
 import { apolloClient } from './apollo/client';
 import './index.css';
+import { BrowserRouter } from 'react-router';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -13,8 +14,11 @@ if (!rootElement) {
 
 createRoot(rootElement).render(
   <StrictMode>
+    {/* You connect Apollo Client to React with the ApolloProvider component */}
     <ApolloProvider client={apolloClient}>
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </ApolloProvider>
   </StrictMode>,
 );

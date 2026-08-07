@@ -9,7 +9,7 @@ import { Field, Float, ID, ObjectType } from "@nestjs/graphql";
 // The object type defines what is available, while the resolver defines how the data is retrieved.
 // Data returned from GraphQL
 
-@ObjectType()
+@ObjectType('Product')
 export class ProductModel {
     @Field(() => ID)
     id!: string

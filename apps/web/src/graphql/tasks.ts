@@ -8,7 +8,7 @@ export interface Task {
   createdAt: string;
   updatedAt: string;
 }
-
+// This only defines and parses the query:
 const TASK_FIELDS = gql`
   fragment TaskFields on Task {
     id
@@ -19,6 +19,7 @@ const TASK_FIELDS = gql`
   }
 `;
 
+// The query document is constant
 export const TASKS_QUERY: TypedDocumentNode<{ tasks: Task[] }, Record<string, never>> = gql`
   query Tasks {
     tasks {
