@@ -1,10 +1,13 @@
+
 import type { Product } from "./product-graphql"
 
-export const ProductItem = ({ name, price }: Product) => {
+export const ProductItem = ({ product }: { product: Product }) => {
     return (
-        <div>
-            <h2>{name}</h2>
-            <div>{price}</div>
-        </div>
+        <li className="product-item">
+            <div>
+                <h2>{product.name}</h2>
+                <p>{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(product.price)}</p>
+            </div>
+        </li>
     )
 } 

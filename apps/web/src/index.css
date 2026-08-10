@@ -59,6 +59,28 @@ body {
   outline-offset: 1px;
 }
 
+.product-form {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0 1.25rem;
+}
+
+.form-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.form-field label {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.field-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
 .button {
   padding: 0.65rem 1.1rem;
   font-size: 0.95rem;
@@ -119,6 +141,31 @@ body {
 
 .task-item.is-completed .task-label span {
   text-decoration: line-through;
+  color: var(--muted);
+}
+
+.product-list {
+  list-style: none;
+  margin: 1.25rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.product-item {
+  padding: 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.product-item h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.product-item p {
+  margin: 0.25rem 0 0;
   color: var(--muted);
 }
 

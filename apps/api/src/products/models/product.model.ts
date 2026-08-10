@@ -9,6 +9,7 @@ import { Field, Float, ID, ObjectType } from "@nestjs/graphql";
 // The object type defines what is available, while the resolver defines how the data is retrieved.
 // Data returned from GraphQL
 
+// frontend fragment on Product matches the backend schema type.
 @ObjectType('Product')
 export class ProductModel {
     @Field(() => ID)
