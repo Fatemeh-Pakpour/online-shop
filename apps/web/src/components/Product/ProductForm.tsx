@@ -1,116 +1,61 @@
-import { useActionState } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useState, type SubmitEventHandler } from 'react';
+import { useMutation } from '@apollo/client/react';
 
-import { apolloClient } from '../../apollo/client';
 import { CREATE_PRODUCT, PRODUCTS_QUERY } from '../../features/products/product-graphql';
 
-type ProductFormState = {
-  message: string;
-  values: {
-    name: string;
-    price: string;
-  };
-  errors: {
-    name?: string;
-    price?: string;
-    form?: string;
-  };
-};
 
-const initialState: ProductFormState = {
-  message: '',
-  values: {
-    name: '',
-    price: '',
-  },
-  errors: {},
-};
+export const ProductForm = () => {
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
+  const [formError, setFormError] = useState('');
 
-async function createProductAction(
-  _previousState: ProductFormState,
-  formData: FormData,
-): Promise<ProductFormState> {
-  const name = String(formData.get('name') ?? '').trim();
-  const priceValue = String(formData.get('price') ?? '').trim();
-  const price = Number(priceValue);
+  const [createProduct, { loading: isCreating }] = useMutation(CREATE_PRODUCT, {
+    update(cache, result) {
+      const newProduct = result.data?.createProduct;
+      if (!newProduct) return;
 
-  const errors: ProductFormState['errors'] = {};
+      cache.updateQuery({ query: PRODUCTS_QUERY }, (existing) =>
+        existing ? { products: [newProduct, ...existing.products] } : { products: [newProduct] },
+      );
+    },
+  });
 
-  if (!name) {
-    errors.name = 'Name is required.';
-  }
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
+    event.preventDefault();
+    setFormError('');
 
-  if (!priceValue || Number.isNaN(price) || price < 0) {
-    errors.price = 'Price must be 0 or more.';
-  }
+    const trimmedName = name.trim();
+    const parsedPrice = Number(price);
 
-  if (Object.keys(errors).length > 0) {
-    return {
-      message: 'Please fix the product details.',
-      values: {
-        name,
-        price: priceValue,
-      },
-      errors,
-    };
-  }
+    if (!trimmedName) {
+      setFormError('Name is required.');
+      return;
+    }
 
-  try {
-    await apolloClient.mutate({
-      mutation: CREATE_PRODUCT,
+    if (!price || Number.isNaN(parsedPrice) || parsedPrice < 0) {
+      setFormError('Price must be 0 or more.');
+      return;
+    }
+
+    void createProduct({
       variables: {
         input: {
-          name,
-          price,
+          name: trimmedName,
+          price: parsedPrice,
         },
       },
-      update(cache, result) {
-        const newProduct = result.data?.createProduct;
-        if (!newProduct) return;
-
-        cache.updateQuery({ query: PRODUCTS_QUERY }, (existing) =>
-          existing ? { products: [newProduct, ...existing.products] } : { products: [newProduct] },
-        );
-      },
-    });
-
-    return {
-      message: 'Product created.',
-      values: {
-        name: '',
-        price: '',
-      },
-      errors: {},
-    };
-  } catch (error) {
-    return {
-      message: '',
-      values: {
-        name,
-        price: priceValue,
-      },
-      errors: {
-        form: error instanceof Error ? error.message : 'Could not create product.',
-      },
-    };
-  }
-}
-
-function ProductSubmitButton() {
-  const { pending } = useFormStatus();
+    })
+      .then(() => {
+        setName('');
+        setPrice('');
+      })
+      .catch(() => {
+        setFormError('Could not create product. Please try again.');
+      });
+  };
 
   return (
-    <button className="button" type="submit" disabled={pending}>
-      {pending ? 'Creating...' : 'Create product'}
-    </button>
-  );
-}
-
-export function ProductForm() {
-  const [state, formAction] = useActionState(createProductAction, initialState);
-
-  return (
-    <form className="product-form" action={formAction}>
+    <form className="product-form" onSubmit={handleSubmit}>
       <div className="form-field">
         <label htmlFor="product-name">Name</label>
         <input
@@ -118,11 +63,11 @@ export function ProductForm() {
           id="product-name"
           name="name"
           type="text"
-          defaultValue={state.values.name}
+          value={name}
           maxLength={200}
-          aria-invalid={Boolean(state.errors.name)}
+          onChange={(event) => setName(event.target.value)}
+        // aria-invalid={Boolean(state.errors.name)}
         />
-        {state.errors.name && <p className="field-error">{state.errors.name}</p>}
       </div>
 
       <div className="form-field">
@@ -132,18 +77,19 @@ export function ProductForm() {
           id="product-price"
           name="price"
           type="number"
+          value={price}
           min="0"
           step="0.01"
-          defaultValue={state.values.price}
-          aria-invalid={Boolean(state.errors.price)}
+          onChange={(event) => setPrice(event.target.value)}
+        // aria-invalid={Boolean(state.errors.price)}
         />
-        {state.errors.price && <p className="field-error">{state.errors.price}</p>}
       </div>
 
-      {state.errors.form && <p className="state state-error">{state.errors.form}</p>}
-      {state.message && !state.errors.form && <p className="state">{state.message}</p>}
+      {formError && <p className="state state-error">{formError}</p>}
 
-      <ProductSubmitButton />
+      <button className="button" type="submit" disabled={isCreating}>
+        {isCreating ? 'Creating...' : 'Create product'}
+      </button>
     </form>
   );
 }
