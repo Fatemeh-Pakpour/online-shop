@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type SubmitEventHandler } from 'react';
 
 interface TaskFormProps {
   disabled: boolean;
@@ -8,7 +8,7 @@ interface TaskFormProps {
 export function TaskForm({ disabled, onSubmit }: TaskFormProps) {
   const [title, setTitle] = useState('');
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     const trimmed = title.trim();
     if (!trimmed || disabled) return;
