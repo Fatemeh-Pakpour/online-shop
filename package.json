@@ -9,6 +9,7 @@
   "scripts": {
     "dev": "concurrently -n api,web -c cyan,magenta \"pnpm dev:api\" \"pnpm dev:web\"",
     "dev:api": "pnpm --filter @app/api dev",
+    "dev:admin-api": "pnpm --filter @app/admin-api dev",
     "dev:web": "pnpm --filter @app/web dev",
     "build": "pnpm -r build",
     "test": "pnpm -r test",
