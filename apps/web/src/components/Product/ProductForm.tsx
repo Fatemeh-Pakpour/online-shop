@@ -1,24 +1,16 @@
 import { useState, type SubmitEventHandler } from 'react';
-import { useMutation } from '@apollo/client/react';
 
-import { CREATE_PRODUCT, PRODUCTS_QUERY } from '../../features/products/product-graphql';
+import type { CreateProductInput } from '../../features/products/product-graphql';
 
+interface ProductFormProps {
+  disabled: boolean;
+  onSubmit: (input: CreateProductInput) => Promise<unknown>;
+}
 
-export const ProductForm = () => {
+export const ProductForm = ({ disabled, onSubmit }: ProductFormProps) => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [formError, setFormError] = useState('');
-
-  const [createProduct, { loading: isCreating }] = useMutation(CREATE_PRODUCT, {
-    update(cache, result) {
-      const newProduct = result.data?.createProduct;
-      if (!newProduct) return;
-
-      cache.updateQuery({ query: PRODUCTS_QUERY }, (existing) =>
-        existing ? { products: [newProduct, ...existing.products] } : { products: [newProduct] },
-      );
-    },
-  });
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
     event.preventDefault();
@@ -37,13 +29,9 @@ export const ProductForm = () => {
       return;
     }
 
-    void createProduct({
-      variables: {
-        input: {
-          name: trimmedName,
-          price: parsedPrice,
-        },
-      },
+    void onSubmit({
+      name: trimmedName,
+      price: parsedPrice,
     })
       .then(() => {
         setName('');
@@ -87,8 +75,8 @@ export const ProductForm = () => {
 
       {formError && <p className="state state-error">{formError}</p>}
 
-      <button className="button" type="submit" disabled={isCreating}>
-        {isCreating ? 'Creating...' : 'Create product'}
+      <button className="button" type="submit" disabled={disabled}>
+        {disabled ? 'Creating...' : 'Create product'}
       </button>
     </form>
   );

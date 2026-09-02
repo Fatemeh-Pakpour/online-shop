@@ -4,7 +4,7 @@ import { ProductItem } from "./productItem";
 import { useProducts } from "./useProducts"
 
 export const ProductsPage = () => {
-    const { products, error, loading } = useProducts();
+    const { products, error, loading, isCreating, createProduct } = useProducts();
     const itemCount = useCartStore((state) => state.itemCount());
     const totalPrice = useCartStore((state) => state.totalPrice());
 
@@ -24,7 +24,7 @@ export const ProductsPage = () => {
             {loading && <p className="state">Loading products...</p>}
             {error && <p className="state state-error">Could not load products: {error.message}</p>}
             {!loading && !error && products.length === 0 && <p className="state">No products yet.</p>}
-            <ProductForm />
+            <ProductForm disabled={isCreating} onSubmit={createProduct} />
             <ul className="product-list">
                 {products.map((product) => (
                     <ProductItem key={product.id} product={product} />

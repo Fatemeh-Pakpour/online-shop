@@ -8,13 +8,23 @@ export const useProducts = () => {
         update(cache, result) {
             const newProduct = result.data?.createProduct;
             if (!newProduct) return
-            cache.updateQuery({ query: PRODUCTS_QUERY }, (existing) => existing
-                ? { products: [newProduct, ...existing.products] } : { products: [newProduct] })
+
+            cache.updateQuery({ query: PRODUCTS_QUERY }, (existing) => {
+                if (!existing) return { products: [newProduct] };
+
+                const alreadyExists = existing.products.some(
+                    (product) => product.id === newProduct.id,
+                );
+
+                if (alreadyExists) return existing;
+
+                return { products: [newProduct, ...existing.products] };
+            })
 
         }
     })
 
 
 
-    return { loading, error, products: data?.products ?? [], isCreating, createProcuct: (input: CreateProductInput) => create({ variables: { input } }) };
+    return { loading, error, products: data?.products ?? [], isCreating, createProduct: (input: CreateProductInput) => create({ variables: { input } }) };
 }

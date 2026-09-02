@@ -11,9 +11,15 @@ export function useTasks() {
       const created = result.data?.createTask;
       if (!created) return;
 
-      cache.updateQuery({ query: TASKS_QUERY }, (existing) =>
-        existing ? { tasks: [created, ...existing.tasks] } : { tasks: [created] },
-      );
+      cache.updateQuery({ query: TASKS_QUERY }, (existing) => {
+        if (!existing) return { tasks: [created] };
+
+        const alreadyExists = existing.tasks.some((task) => task.id === created.id);
+
+        if (alreadyExists) return existing;
+
+        return { tasks: [created, ...existing.tasks] };
+      });
     },
   });
 
