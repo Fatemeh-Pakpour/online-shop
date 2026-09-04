@@ -4,6 +4,8 @@ packages:
 
 allowBuilds:
   '@apollo/protobufjs': true
+  # postinstall only prints a sponsor message; nothing to build.
+  browser-tabs-lock: false
   unrs-resolver: true
 
 minimumReleaseAgeExclude:

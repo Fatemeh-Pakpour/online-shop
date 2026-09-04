@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@apollo/client": "^4.2.8",
+    "@auth0/auth0-react": "^2.24.1",
     "@hookform/resolvers": "^5.7.1",
     "graphql": "^16.14.2",
     "react": "^19.2.8",
