@@ -1,5 +1,6 @@
+import type { Reference } from "@apollo/client"
 import { useMutation, useQuery } from "@apollo/client/react"
-import { CREATE_PRODUCT, PRODUCTS_QUERY, type CreateProductInput } from "./product-graphql"
+import { CREATE_PRODUCT, PRODUCT_FIELD, PRODUCTS_QUERY, type CreateProductInput } from "./product-graphql"
 
 export const useProducts = () => {
     const { loading, error, data } = useQuery(PRODUCTS_QUERY)
@@ -9,16 +10,25 @@ export const useProducts = () => {
             const newProduct = result.data?.createProduct;
             if (!newProduct) return
 
-            cache.updateQuery({ query: PRODUCTS_QUERY }, (existing) => {
-                if (!existing) return { products: [newProduct] };
+            const newProductRef = cache.writeFragment({
+                data: newProduct,
+                fragment: PRODUCT_FIELD,
+            });
 
-                const alreadyExists = existing.products.some(
-                    (product) => product.id === newProduct.id,
-                );
+            if (!newProductRef) return;
 
-                if (alreadyExists) return existing;
+            cache.modify({
+                fields: {
+                    products(existingProductRefs: readonly Reference[] = [], { readField }) {
+                        const alreadyExists = existingProductRefs.some(
+                            (productRef) => readField('id', productRef) === newProduct.id,
+                        );
 
-                return { products: [newProduct, ...existing.products] };
+                        if (alreadyExists) return existingProductRefs;
+
+                        return [newProductRef, ...existingProductRefs];
+                    },
+                },
             })
 
         }

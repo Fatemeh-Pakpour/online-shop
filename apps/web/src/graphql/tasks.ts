@@ -9,7 +9,7 @@ export interface Task {
   updatedAt: string;
 }
 // This only defines and parses the query:
-const TASK_FIELDS = gql`
+export const TASK_FIELDS = gql`
   fragment TaskFields on Task {
     id
     title

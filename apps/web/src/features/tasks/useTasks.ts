@@ -1,6 +1,7 @@
+import type { Reference } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 
-import { CREATE_TASK, DELETE_TASK, TASKS_QUERY, TOGGLE_TASK, type Task } from '../../graphql/tasks';
+import { CREATE_TASK, DELETE_TASK, TASKS_QUERY, TASK_FIELDS, TOGGLE_TASK, type Task } from '../../graphql/tasks';
 
 export function useTasks() {
   const { data, loading, error } = useQuery(TASKS_QUERY);
@@ -11,14 +12,25 @@ export function useTasks() {
       const created = result.data?.createTask;
       if (!created) return;
 
-      cache.updateQuery({ query: TASKS_QUERY }, (existing) => {
-        if (!existing) return { tasks: [created] };
+      const createdTaskRef = cache.writeFragment({
+        data: created,
+        fragment: TASK_FIELDS,
+      });
 
-        const alreadyExists = existing.tasks.some((task) => task.id === created.id);
+      if (!createdTaskRef) return;
 
-        if (alreadyExists) return existing;
+      cache.modify({
+        fields: {
+          tasks(existingTaskRefs: readonly Reference[] = [], { readField }) {
+            const alreadyExists = existingTaskRefs.some(
+              (taskRef) => readField('id', taskRef) === created.id,
+            );
 
-        return { tasks: [created, ...existing.tasks] };
+            if (alreadyExists) return existingTaskRefs;
+
+            return [createdTaskRef, ...existingTaskRefs];
+          },
+        },
       });
     },
   });
@@ -29,6 +41,16 @@ export function useTasks() {
   const [deleteTask] = useMutation(DELETE_TASK, {
     update(cache, result, { variables }) {
       if (!result.data?.deleteTask || !variables) return;
+
+      cache.modify({
+        fields: {
+          tasks(existingTaskRefs: readonly Reference[] = [], { readField }) {
+            return existingTaskRefs.filter(
+              (taskRef) => readField('id', taskRef) !== variables.id,
+            );
+          },
+        },
+      });
 
       cache.evict({ id: cache.identify({ __typename: 'Task', id: variables.id }) });
       cache.gc();

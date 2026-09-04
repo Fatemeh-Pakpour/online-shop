@@ -14,7 +14,7 @@ export interface CreateProductInput {
   price: number;
 }
 
-const PRODUCT_FIELD = gql`
+export const PRODUCT_FIELD = gql`
   fragment ProductField on Product {
     id
     name
