@@ -3,6 +3,9 @@ import { CombinedGraphQLErrors } from "@apollo/client";
 import { HttpLink } from "@apollo/client";
 import { ApolloClient } from "@apollo/client";
 import { ErrorLink } from "@apollo/client/link/error";
+import { SetContextLink } from "@apollo/client/link/context";
+
+import { getAccessToken } from "../auth/access-token";
 
 // HttpLink - a customized Apollo Link that knows how to execute network requests against a GraphQL server.
 
@@ -20,8 +23,22 @@ const errorLink = new ErrorLink(({ error, operation }) => {
   console.error(`[Network error] ${operation.operationName}:`, error);
 });
 
+// Runs per request so a token that was refreshed mid-session is picked up.
+const authLink = new SetContextLink(async (prevContext) => {
+  const token = await getAccessToken();
+  if (!token) return {};
+
+  return {
+    headers: {
+      ...prevContext.headers,
+      authorization: `Bearer ${token}`,
+    },
+  };
+});
+
 const link = ApolloLink.from([
   errorLink,
+  authLink,
   new HttpLink({ uri }),
 ]);
 
