@@ -19,6 +19,7 @@
 body {
   margin: 0;
   background: var(--bg);
+  min-width: 320px;
 }
 
 .page {
@@ -32,6 +33,7 @@ body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
+  min-width: 0;
 }
 
 .page-header h1 {
@@ -79,6 +81,8 @@ body {
   border-radius: 8px;
   background: var(--surface);
   color: inherit;
+  min-width: 0;
+  width: 100%;
 }
 
 .task-input:focus-visible {
@@ -111,6 +115,7 @@ body {
 .button {
   padding: 0.65rem 1.1rem;
   font-size: 0.95rem;
+  min-height: 2.75rem;
   border: none;
   border-radius: 8px;
   background: var(--accent);
@@ -126,7 +131,7 @@ body {
 .button-ghost {
   background: transparent;
   color: var(--danger);
-  padding: 0.35rem 0.5rem;
+  padding: 0.35rem 0.7rem;
 }
 
 .state {
@@ -156,6 +161,7 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 10px;
+  min-width: 0;
 }
 
 .task-label {
@@ -164,6 +170,7 @@ body {
   gap: 0.65rem;
   cursor: pointer;
   overflow-wrap: anywhere;
+  min-width: 0;
 }
 
 .task-item.is-completed .task-label span {
@@ -188,11 +195,13 @@ body {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
+  min-width: 0;
 }
 
 .product-item h2 {
   margin: 0;
   font-size: 1rem;
+  overflow-wrap: anywhere;
 }
 
 .product-item p {
@@ -201,14 +210,35 @@ body {
 }
 
 @media (max-width: 520px) {
+  .page {
+    padding: 1.25rem 0.75rem 3rem;
+  }
+
   .page-header,
   .product-item {
     align-items: stretch;
     flex-direction: column;
   }
 
+  .page-subtitle {
+    margin-bottom: 0;
+  }
+
   .cart-summary {
     text-align: left;
+  }
+
+  .task-form {
+    display: grid;
+  }
+
+  .task-item {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
   }
 }
 
