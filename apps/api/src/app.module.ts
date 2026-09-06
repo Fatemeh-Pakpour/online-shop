@@ -7,6 +7,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
+import { AuthModule } from './auth';
 import { envValidationSchema } from './config/env.validation';
 import { ProductModule } from './products/product.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -25,6 +26,8 @@ const isProduction = process.env.NODE_ENV === 'production';
       driver: ApolloDriver,
       path: '/graphql',
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      // Exposes the request to GqlAuthGuard so it can read the Authorization header.
+      context: ({ req }: { req: unknown }) => ({ req }),
       sortSchema: true,
       playground: false,
       introspection: !isProduction,
@@ -36,6 +39,7 @@ const isProduction = process.env.NODE_ENV === 'production';
         uri: config.getOrThrow<string>('MONGODB_URI'),
       }),
     }),
+    AuthModule,
     TasksModule,
     ProductModule,
   ],
