@@ -4,18 +4,22 @@ import { ProductModel } from "./models/product.model";
 import { ParseObjectIdPipe } from "src/common/pipes/parse-object-id.pipe";
 import { CreateProductInput } from "./dto/create-product.input";
 import { UpdateProductInput } from "./dto/update-product.input";
+import { Public } from "src/auth";
 
 // The resolver should normally call the service. It should not directly call Mongoose:
 @Resolver(() => ProductModel)
 export class ProductResolver {
   constructor(private readonly productService: ProductService) { }
 
+  // The catalogue is readable by anyone; only the mutations below need a signed-in caller.
+  @Public()
   // Create a GraphQL query named products. It returns an array of ProductModel.
   @Query(() => [ProductModel], { name: "products" })
   products(): Promise<ProductModel[]> {
     return this.productService.findAll()
   }
 
+  @Public()
   // becuase the response is null then we need to add nullable in the GraphQL as well
   @Query(() => ProductModel, { name: "product", nullable: true })
   product(@Args('id', { type: () => ID }, ParseObjectIdPipe) id: string): Promise<ProductModel | null> {
