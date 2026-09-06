@@ -34,3 +34,8 @@ pnpm workspaces monorepo — `apps/api` (NestJS + Apollo + Mongoose) and `apps/w
 - `graphql` must stay on `^16` — Apollo Server 5 and `@nestjs/graphql` 13 do not accept v17.
 - The GraphQL schema is code-first and written to `apps/api/src/schema.gql` on startup.
 - The API refuses to boot without a valid `MONGODB_URI` (Joi validation).
+- The API also refuses to boot without `AUTH0_ISSUER_BASE_URL` and `AUTH0_AUDIENCE`.
+- `jose` is ESM-only. It loads under CommonJS via `require(esm)`, which needs Node >= 20.19; suites that
+  transitively import it must `jest.mock('jose', () => ...)` with an explicit factory.
+- GraphQL operations require a valid Auth0 access token by default (`GqlAuthGuard` is registered as an
+  `APP_GUARD`). Mark deliberate exceptions with `@Public()` from `src/auth`.
