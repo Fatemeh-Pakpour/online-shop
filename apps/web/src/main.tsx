@@ -1,4 +1,5 @@
 import { ApolloProvider } from '@apollo/client/react';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
@@ -7,6 +8,7 @@ import { apolloClient } from './apollo/client';
 import './index.css';
 import { BrowserRouter } from 'react-router';
 import { Auth0ProviderWithNavigate } from './auth';
+import { queryClient } from './query-client';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
@@ -19,9 +21,11 @@ createRoot(rootElement).render(
     {/* Router first: Auth0ProviderWithNavigate uses useNavigate for the redirect callback. */}
     <BrowserRouter>
       <Auth0ProviderWithNavigate>
-        <ApolloProvider client={apolloClient}>
-          <App />
-        </ApolloProvider>
+        <QueryClientProvider client={queryClient}>
+          <ApolloProvider client={apolloClient}>
+            <App />
+          </ApolloProvider>
+        </QueryClientProvider>
       </Auth0ProviderWithNavigate>
     </BrowserRouter>
   </StrictMode>,
