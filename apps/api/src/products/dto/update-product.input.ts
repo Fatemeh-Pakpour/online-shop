@@ -1,6 +1,6 @@
-import { Field, Float, InputType } from '@nestjs/graphql';
+import { Field, Float, ID, InputType } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional, IsString, Length, Min } from 'class-validator';
+import { IsMongoId, IsNumber, IsOptional, IsString, Length, Min } from 'class-validator';
 
 // Every field is optional — clients send only what they want to change.
 @InputType()
@@ -17,4 +17,9 @@ export class UpdateProductInput {
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   price?: number;
+
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsMongoId()
+  categoryId?: string;
 }
