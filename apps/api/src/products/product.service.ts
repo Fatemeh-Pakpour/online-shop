@@ -6,6 +6,7 @@ import { CreateProductInput } from './dto/create-product.input';
 import { UpdateProductInput } from './dto/update-product.input';
 import { ProductModel } from './models/product.model';
 import { Product, ProductDocument } from './schema/product.schema';
+import { CategoryService } from '../categories/category.service';
 
 // It should not contain GraphQL decorators such as @Query() and @Mutation().
 
@@ -16,6 +17,7 @@ export class ProductService {
         // that is telling When someone asks for @InjectModel(Product.name) them the Mongoose model created from ProductSchema.
         @InjectModel(Product.name)
         private readonly productModel: Model<ProductDocument>,
+        private readonly categoryService: CategoryService,
     ) { }
 
     async findAll(): Promise<ProductModel[]> {
@@ -29,9 +31,14 @@ export class ProductService {
     }
 
     async create(input: CreateProductInput): Promise<ProductModel> {
+        if (input.categoryId) {
+            await this.categoryService.assertExists(input.categoryId);
+        }
+
         const product = await this.productModel.create({
             name: input.name,
             price: input.price,
+            categoryId: input.categoryId ?? null,
         });
         return this.toModel(product);
     }
@@ -39,6 +46,10 @@ export class ProductService {
     async update(id: string, input: UpdateProductInput): Promise<ProductModel> {
         if (Object.keys(input).length === 0) {
             throw new BadRequestException('At least one product field must be provided.');
+        }
+
+        if (input.categoryId) {
+            await this.categoryService.assertExists(input.categoryId);
         }
 
         const product = await this.productModel
@@ -76,6 +87,7 @@ export class ProductService {
             id: product._id.toString(),
             name: product.name,
             price: product.price,
+            categoryId: product.categoryId ?? null,
             createdAt: product.createdAt,
             updatedAt: product.updatedAt,
         };
