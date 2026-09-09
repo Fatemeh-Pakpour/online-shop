@@ -1,0 +1,79 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type Category {
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  updatedAt: DateTime!
+}
+
+input CreateCategoryInput {
+  name: String!
+}
+
+input CreateProductInput {
+  categoryId: ID
+  name: String!
+  price: Float!
+}
+
+input CreateTaskInput {
+  completed: Boolean = false
+  title: String!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Mutation {
+  createCategory(input: CreateCategoryInput!): Category!
+  createProduct(input: CreateProductInput!): Product!
+  createTask(input: CreateTaskInput!): Task!
+  deleteProduct(id: ID!): Boolean!
+  deleteTask(id: ID!): Boolean!
+  toggleTask(id: ID!): Task!
+  updateProduct(id: ID!, input: UpdateProductInput!): Product!
+  updateTask(id: ID!, input: UpdateTaskInput!): Task!
+}
+
+type Product {
+  category: Category
+  categoryId: ID
+  createdAt: DateTime!
+  id: ID!
+  name: String!
+  price: Float!
+  updatedAt: DateTime!
+}
+
+type Query {
+  categories: [Category!]!
+  category(id: ID!): Category
+  product(id: ID!): Product
+  products: [Product!]!
+  task(id: ID!): Task
+  tasks: [Task!]!
+}
+
+type Task {
+  completed: Boolean!
+  createdAt: DateTime!
+  id: ID!
+  title: String!
+  updatedAt: DateTime!
+}
+
+input UpdateProductInput {
+  categoryId: ID
+  name: String
+  price: Float
+}
+
+input UpdateTaskInput {
+  completed: Boolean
+  title: String
+}
