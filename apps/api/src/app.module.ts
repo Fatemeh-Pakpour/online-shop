@@ -8,6 +8,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
 import { AuthModule } from './auth';
+import { CategoryModule } from './categories/category.module';
 import { envValidationSchema } from './config/env.validation';
 import { ProductModule } from './products/product.module';
 import { TasksModule } from './tasks/tasks.module';
@@ -40,6 +41,7 @@ const isProduction = process.env.NODE_ENV === 'production';
       }),
     }),
     AuthModule,
+    CategoryModule,
     TasksModule,
     ProductModule,
   ],
