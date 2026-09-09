@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
@@ -30,6 +30,10 @@ export class TasksService {
   }
 
   async update(id: string, input: UpdateTaskInput): Promise<TaskModel> {
+    if (Object.keys(input).length === 0) {
+      throw new BadRequestException('At least one task field must be provided.');
+    }
+
     const task = await this.taskModel
       .findByIdAndUpdate(id, { $set: input }, { new: true, runValidators: true })
       .exec();
