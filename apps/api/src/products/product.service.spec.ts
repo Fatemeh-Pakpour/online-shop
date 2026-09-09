@@ -5,6 +5,7 @@ import { Types } from 'mongoose';
 
 import { ProductService } from './product.service';
 import { Product } from './schema/product.schema';
+import { CategoryService } from '../categories/category.service';
 
 // Types is an object exported by Mongoose. It contains helper classes/types from MongoDB/Mongoose.
 // That creates a fake MongoDB ObjectId for the test.
@@ -16,6 +17,7 @@ const doc = {
   _id: id,
   name: 'Keyboard',
   price: 49.99,
+  categoryId: null,
   createdAt: now,
   updatedAt: now,
 };
@@ -29,7 +31,11 @@ const modelMock = {
   create: jest.fn(),
 };
 
-const exec = <T>(value: T) => ({ exec: Promise.resolve(value) })
+const categoryServiceMock = {
+  assertExists: jest.fn(),
+};
+
+const exec = <T>(value: T) => ({ exec: () => Promise.resolve(value) })
 
 describe('ProductService', () => {
   let service: ProductService;
@@ -38,7 +44,11 @@ describe('ProductService', () => {
     jest.resetAllMocks();
     const moduleRef = await Test.createTestingModule({
       // When ProductService asks for @InjectModel(Product.name), give it modelMock instead of the real MongoDB model.
-      providers: [ProductService, { provide: getModelToken(Product.name), useValue: modelMock }],
+      providers: [
+        ProductService,
+        { provide: getModelToken(Product.name), useValue: modelMock },
+        { provide: CategoryService, useValue: categoryServiceMock },
+      ],
     }).compile();
     service = moduleRef.get(ProductService);
   });
@@ -47,7 +57,14 @@ describe('ProductService', () => {
     modelMock.find.mockReturnValue({ sort: () => exec([doc]) });
 
     await expect(service.findAll()).resolves.toEqual([
-      { id: id.toString(), name: 'Keyboard', price: 49.99, createdAt: now, updatedAt: now },
+      {
+        id: id.toString(),
+        name: 'Keyboard',
+        price: 49.99,
+        categoryId: null,
+        createdAt: now,
+        updatedAt: now,
+      },
     ]);
   });
 
@@ -62,7 +79,25 @@ describe('ProductService', () => {
 
     await service.create({ name: 'Keyboard', price: 49.99 });
 
-    expect(modelMock.create).toHaveBeenCalledWith({ name: 'Keyboard', price: 49.99 });
+    expect(modelMock.create).toHaveBeenCalledWith({
+      name: 'Keyboard',
+      price: 49.99,
+      categoryId: null,
+    });
+  });
+
+  it('checks that a category exists before assigning it to a product', async () => {
+    const categoryId = new Types.ObjectId().toString();
+    modelMock.create.mockResolvedValue({ ...doc, categoryId });
+
+    await service.create({ name: 'Keyboard', price: 49.99, categoryId });
+
+    expect(categoryServiceMock.assertExists).toHaveBeenCalledWith(categoryId);
+    expect(modelMock.create).toHaveBeenCalledWith({
+      name: 'Keyboard',
+      price: 49.99,
+      categoryId,
+    });
   });
 
   it('runs schema validators on update', async () => {
@@ -90,10 +125,12 @@ describe('ProductService', () => {
     );
   });
 
-  it('reports whether a delete removed a document', async () => {
+  it('throws NotFoundException when deleting a missing product', async () => {
     modelMock.findByIdAndDelete.mockReturnValue(exec(null));
-    await expect(service.remove(id.toString())).resolves.toBe(false);
+    await expect(service.remove(id.toString())).rejects.toBeInstanceOf(NotFoundException);
+  });
 
+  it('reports when a delete removed a document', async () => {
     modelMock.findByIdAndDelete.mockReturnValue(exec(doc));
     await expect(service.remove(id.toString())).resolves.toBe(true);
   });
