@@ -1,5 +1,7 @@
 import { Field, Float, ID, ObjectType } from "@nestjs/graphql";
 
+import { CategoryModel } from "../../categories/models/category.model";
+
 // Graphql output model not the validation model
 // Use this TypeScript class as a GraphQL response/output type.
 
@@ -20,6 +22,12 @@ export class ProductModel {
 
     @Field(() => Float)
     price!: number
+
+    @Field(() => ID, { nullable: true })
+    categoryId?: string | null
+
+    @Field(() => CategoryModel, { nullable: true })
+    category?: CategoryModel | null
 
     @Field()
     createdAt!: Date
