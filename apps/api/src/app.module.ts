@@ -7,7 +7,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
-import { AuthModule } from './auth';
+// import { AuthModule } from './auth';
 import { CategoryModule } from './categories/category.module';
 import { envValidationSchema } from './config/env.validation';
 import { ProductModule } from './products/product.module';
@@ -40,7 +40,7 @@ const isProduction = process.env.NODE_ENV === 'production';
         uri: config.getOrThrow<string>('MONGODB_URI'),
       }),
     }),
-    AuthModule,
+    // AuthModule,
     CategoryModule,
     TasksModule,
     ProductModule,
