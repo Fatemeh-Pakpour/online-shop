@@ -19,6 +19,9 @@ export class Product {
     @Prop({ required: true, min: 0 })
     price!: number
 
+    @Prop({ type: String, default: null })
+    categoryId?: string | null
+
     // Declared for TypeScript only — Mongoose populates these via `timestamps: true`.
     createdAt!: Date;
     updatedAt!: Date;
