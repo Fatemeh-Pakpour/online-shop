@@ -1,6 +1,6 @@
-import { Field, Float, InputType } from '@nestjs/graphql';
+import { Field, Float, ID, InputType } from '@nestjs/graphql';
 import { Transform } from 'class-transformer';
-import { IsNotEmpty, IsNumber, IsString, Length, Min } from 'class-validator';
+import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, IsString, Length, Min } from 'class-validator';
 
 //  // Data received from the client
 // This class represents data that a GraphQL client can send to the server.
@@ -17,4 +17,9 @@ export class CreateProductInput {
   @IsNumber({ maxDecimalPlaces: 2 })
   @Min(0)
   price!: number;
+
+  @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @IsMongoId()
+  categoryId?: string;
 }
