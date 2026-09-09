@@ -1,15 +1,20 @@
-import { Args, ID, Mutation, Query, Resolver } from "@nestjs/graphql";
+import { Args, ID, Mutation, Parent, Query, ResolveField, Resolver } from "@nestjs/graphql";
 import { ProductService } from "./product.service";
 import { ProductModel } from "./models/product.model";
 import { ParseObjectIdPipe } from "src/common/pipes/parse-object-id.pipe";
 import { CreateProductInput } from "./dto/create-product.input";
 import { UpdateProductInput } from "./dto/update-product.input";
 import { Public } from "src/auth";
+import { CategoryModel } from "src/categories/models/category.model";
+import { ProductCategoryLoader } from "./product-category.loader";
 
 // The resolver should normally call the service. It should not directly call Mongoose:
 @Resolver(() => ProductModel)
 export class ProductResolver {
-  constructor(private readonly productService: ProductService) { }
+  constructor(
+    private readonly productService: ProductService,
+    private readonly productCategoryLoader: ProductCategoryLoader,
+  ) { }
 
   // The catalogue is readable by anyone; only the mutations below need a signed-in caller.
   @Public()
@@ -46,6 +51,13 @@ export class ProductResolver {
   @Mutation(() => Boolean)
   deleteProduct(@Args('id', { type: () => ID }, ParseObjectIdPipe) id: string): Promise<boolean> {
     return this.productService.remove(id)
+  }
+
+  @Public()
+  @ResolveField(() => CategoryModel, { nullable: true })
+  category(@Parent() product: ProductModel): Promise<CategoryModel | null> {
+    if (!product.categoryId) return Promise.resolve(null);
+    return this.productCategoryLoader.load(product.categoryId);
   }
 
 }
