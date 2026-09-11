@@ -22,3 +22,9 @@ pnpm-debug.log*
 .vscode/*
 !.vscode/extensions.json
 .idea/
+
+# Demo Time sample files
+.demo/advanced-demo.json
+.demo/slides/advanced-end.md
+.demo/slides/advanced-start.md
+math.ts
