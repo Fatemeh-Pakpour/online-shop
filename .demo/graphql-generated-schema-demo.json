@@ -1,0 +1,99 @@
+{
+  "$schema": "https://demotime.show/demo-time.schema.json",
+  "title": "GraphQL Generated Schema Demo",
+  "description": "Demo how NestJS code-first GraphQL generates schema.gql from resolver, model, and input decorators.",
+  "version": 3,
+  "scenes": [
+    {
+      "title": "Start",
+      "description": "Introduce the idea that schema.gql is generated, not manually maintained.",
+      "moves": [
+        {
+          "action": "setTheme",
+          "theme": "Default Dark Modern"
+        },
+        {
+          "action": "openSlide",
+          "path": ".demo/slides/graphql-generated-schema-start.md"
+        }
+      ]
+    },
+    {
+      "title": "Generation Config",
+      "description": "Show the NestJS GraphQL autoSchemaFile setting.",
+      "moves": [
+        {
+          "action": "open",
+          "path": "apps/api/src/app.module.ts"
+        },
+        {
+          "action": "highlight",
+          "path": "apps/api/src/app.module.ts",
+          "startPlaceholder": "GraphQLModule.forRoot<ApolloDriverConfig>({",
+          "endPlaceholder": "sortSchema: true,"
+        }
+      ]
+    },
+    {
+      "title": "Source Of Truth",
+      "description": "Show that GraphQL fields come from TypeScript decorators.",
+      "moves": [
+        {
+          "action": "open",
+          "path": "apps/api/src/categories/models/category.model.ts"
+        },
+        {
+          "action": "highlight",
+          "path": "apps/api/src/categories/models/category.model.ts",
+          "startPlaceholder": "@ObjectType('Category')",
+          "endPlaceholder": "updatedAt!: Date;"
+        }
+      ]
+    },
+    {
+      "title": "Operations",
+      "description": "Show that queries and mutations come from resolver decorators.",
+      "moves": [
+        {
+          "action": "open",
+          "path": "apps/api/src/categories/category.resolver.ts"
+        },
+        {
+          "action": "highlight",
+          "path": "apps/api/src/categories/category.resolver.ts",
+          "startPlaceholder": "@Query(() => [CategoryModel], { name: 'categories' })",
+          "endPlaceholder": "return this.categoryService.create(input);"
+        }
+      ]
+    },
+    {
+      "title": "Generated Output",
+      "description": "Show the generated schema as the result of the decorators.",
+      "moves": [
+        {
+          "action": "open",
+          "path": "apps/api/src/schema.gql"
+        },
+        {
+          "action": "highlight",
+          "path": "apps/api/src/schema.gql",
+          "startPlaceholder": "# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)",
+          "endPlaceholder": "type Category {"
+        }
+      ]
+    },
+    {
+      "title": "End",
+      "description": "Recap what to edit and what not to edit.",
+      "moves": [
+        {
+          "action": "openSlide",
+          "path": ".demo/slides/graphql-generated-schema-end.md"
+        },
+        {
+          "action": "unsetTheme"
+        }
+      ]
+    }
+  ]
+}
