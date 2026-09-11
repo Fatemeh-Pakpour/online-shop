@@ -1,0 +1,7 @@
+[
+  {
+    "key": "enter",
+    "command": "demo-time.start",
+    "when": "demo-time.presentation"
+  }
+]
