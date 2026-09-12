@@ -10,6 +10,7 @@ export const ProductItem = ({ product }: { product: Product }) => {
             <div>
                 <h2>{product.name}</h2>
                 <p>{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(product.price)}</p>
+                <p className="product-category">{product.category?.name ?? 'No category'}</p>
             </div>
             <button
                 className="button"
