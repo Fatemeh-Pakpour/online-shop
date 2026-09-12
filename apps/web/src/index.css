@@ -106,6 +106,31 @@ body {
   font-size: 0.9rem;
 }
 
+.category-panel {
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem 0 1.25rem;
+  padding: 0.85rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.category-panel h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.category-panel p {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.category-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .field-error {
   margin: 0;
   color: var(--danger);
@@ -209,6 +234,10 @@ body {
   color: var(--muted);
 }
 
+.product-category {
+  font-size: 0.85rem;
+}
+
 @media (max-width: 520px) {
   .page {
     padding: 1.25rem 0.75rem 3rem;
@@ -229,6 +258,10 @@ body {
   }
 
   .task-form {
+    display: grid;
+  }
+
+  .category-form {
     display: grid;
   }
 
