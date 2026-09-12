@@ -5,13 +5,26 @@ export interface Product {
   id: string;
   name: string;
   price: number;
+  categoryId?: string | null;
+  category?: Category | null;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface Category {
+  __typename?: 'Category';
+  id: string;
+  name: string;
 }
 
 export interface CreateProductInput {
   name: string;
   price: number;
+  categoryId?: string;
+}
+
+export interface CreateCategoryInput {
+  name: string;
 }
 
 export const PRODUCT_FIELD = gql`
@@ -19,8 +32,20 @@ export const PRODUCT_FIELD = gql`
     id
     name
     price
+    categoryId
+    category {
+      id
+      name
+    }
     updatedAt
     createdAt
+  }
+`;
+
+export const CATEGORY_FIELD = gql`
+  fragment CategoryField on Category {
+    id
+    name
   }
 `;
 
@@ -33,6 +58,15 @@ export const PRODUCTS_QUERY: TypedDocumentNode<{ products: Product[] }> = gql`
   ${PRODUCT_FIELD}
 `;
 
+export const CATEGORIES_QUERY: TypedDocumentNode<{ categories: Category[] }> = gql`
+  query Categories {
+    categories {
+      ...CategoryField
+    }
+  }
+  ${CATEGORY_FIELD}
+`;
+
 export const CREATE_PRODUCT: TypedDocumentNode<
   { createProduct: Product },
   { input: CreateProductInput }
@@ -43,4 +77,16 @@ export const CREATE_PRODUCT: TypedDocumentNode<
     }
   }
   ${PRODUCT_FIELD}
+`;
+
+export const CREATE_CATEGORY: TypedDocumentNode<
+  { createCategory: Category },
+  { input: CreateCategoryInput }
+> = gql`
+  mutation CreateCategory($input: CreateCategoryInput!) {
+    createCategory(input: $input) {
+      ...CategoryField
+    }
+  }
+  ${CATEGORY_FIELD}
 `;
