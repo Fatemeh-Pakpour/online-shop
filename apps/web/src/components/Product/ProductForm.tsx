@@ -1,15 +1,18 @@
 import { useState, type SubmitEventHandler } from 'react';
 
-import type { CreateProductInput } from '../../features/products/product-graphql';
+import type { Category, CreateProductInput } from '../../features/products/product-graphql';
 
 interface ProductFormProps {
   disabled: boolean;
+  categories: Category[];
+  categoriesDisabled?: boolean;
   onSubmit: (input: CreateProductInput) => Promise<unknown>;
 }
 
-export const ProductForm = ({ disabled, onSubmit }: ProductFormProps) => {
+export const ProductForm = ({ disabled, categories, categoriesDisabled = false, onSubmit }: ProductFormProps) => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
+  const [categoryId, setCategoryId] = useState('');
   const [formError, setFormError] = useState('');
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = (event) => {
@@ -29,13 +32,20 @@ export const ProductForm = ({ disabled, onSubmit }: ProductFormProps) => {
       return;
     }
 
-    void onSubmit({
+    const input: CreateProductInput = {
       name: trimmedName,
       price: parsedPrice,
-    })
+    };
+
+    if (categoryId) {
+      input.categoryId = categoryId;
+    }
+
+    void onSubmit(input)
       .then(() => {
         setName('');
         setPrice('');
+        setCategoryId('');
       })
       .catch(() => {
         setFormError('Could not create product. Please try again.');
@@ -71,6 +81,25 @@ export const ProductForm = ({ disabled, onSubmit }: ProductFormProps) => {
           onChange={(event) => setPrice(event.target.value)}
         // aria-invalid={Boolean(state.errors.price)}
         />
+      </div>
+
+      <div className="form-field">
+        <label htmlFor="product-category">Category</label>
+        <select
+          className="task-input"
+          id="product-category"
+          name="categoryId"
+          value={categoryId}
+          disabled={categoriesDisabled}
+          onChange={(event) => setCategoryId(event.target.value)}
+        >
+          <option value="">No category</option>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {formError && <p className="state state-error">{formError}</p>}
