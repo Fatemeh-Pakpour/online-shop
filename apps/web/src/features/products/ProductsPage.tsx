@@ -23,16 +23,23 @@ export const ProductsPage = () => {
     const [categoryName, setCategoryName] = useState('');
     const [categoryError, setCategoryError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('all');
     const visibleProducts = useMemo(() => {
         const normalizedSearch = searchTerm.trim().toLowerCase();
 
-        if (!normalizedSearch) return products;
-
         return products.filter((product) => {
+            const matchesCategory =
+                categoryFilter === 'all' ||
+                (categoryFilter === 'uncategorized' && !product.categoryId) ||
+                product.categoryId === categoryFilter;
+
+            if (!matchesCategory) return false;
+            if (!normalizedSearch) return true;
+
             const categoryName = product.category?.name ?? '';
             return `${product.name} ${categoryName}`.toLowerCase().includes(normalizedSearch);
         });
-    }, [products, searchTerm]);
+    }, [categoryFilter, products, searchTerm]);
 
     const handleCreateCategory: SubmitEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
@@ -77,6 +84,23 @@ export const ProductsPage = () => {
                         placeholder="Search products"
                         onChange={(event) => setSearchTerm(event.target.value)}
                     />
+                </label>
+                <label className="form-field">
+                    <span>Category</span>
+                    <select
+                        className="task-input"
+                        value={categoryFilter}
+                        disabled={categoriesLoading}
+                        onChange={(event) => setCategoryFilter(event.target.value)}
+                    >
+                        <option value="all">All categories</option>
+                        <option value="uncategorized">No category</option>
+                        {categories.map((category) => (
+                            <option key={category.id} value={category.id}>
+                                {category.name}
+                            </option>
+                        ))}
+                    </select>
                 </label>
             </div>
 
