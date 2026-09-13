@@ -24,10 +24,11 @@ export const ProductsPage = () => {
     const [categoryError, setCategoryError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
+    const [sortMode, setSortMode] = useState('newest');
     const visibleProducts = useMemo(() => {
         const normalizedSearch = searchTerm.trim().toLowerCase();
 
-        return products.filter((product) => {
+        const filteredProducts = products.filter((product) => {
             const matchesCategory =
                 categoryFilter === 'all' ||
                 (categoryFilter === 'uncategorized' && !product.categoryId) ||
@@ -39,7 +40,23 @@ export const ProductsPage = () => {
             const categoryName = product.category?.name ?? '';
             return `${product.name} ${categoryName}`.toLowerCase().includes(normalizedSearch);
         });
-    }, [categoryFilter, products, searchTerm]);
+
+        return [...filteredProducts].sort((firstProduct, secondProduct) => {
+            if (sortMode === 'name') {
+                return firstProduct.name.localeCompare(secondProduct.name);
+            }
+
+            if (sortMode === 'price-low') {
+                return firstProduct.price - secondProduct.price;
+            }
+
+            if (sortMode === 'price-high') {
+                return secondProduct.price - firstProduct.price;
+            }
+
+            return Date.parse(secondProduct.createdAt) - Date.parse(firstProduct.createdAt);
+        });
+    }, [categoryFilter, products, searchTerm, sortMode]);
 
     const handleCreateCategory: SubmitEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
@@ -100,6 +117,19 @@ export const ProductsPage = () => {
                                 {category.name}
                             </option>
                         ))}
+                    </select>
+                </label>
+                <label className="form-field">
+                    <span>Sort</span>
+                    <select
+                        className="task-input"
+                        value={sortMode}
+                        onChange={(event) => setSortMode(event.target.value)}
+                    >
+                        <option value="newest">Newest first</option>
+                        <option value="name">Name A-Z</option>
+                        <option value="price-low">Price low to high</option>
+                        <option value="price-high">Price high to low</option>
                     </select>
                 </label>
             </div>
