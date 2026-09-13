@@ -1,4 +1,4 @@
-import { useState, type SubmitEventHandler } from "react";
+import { useMemo, useState, type SubmitEventHandler } from "react";
 
 import { ProductForm } from "../../components/Product/ProductForm";
 import { useCartStore } from "../../stores/cartStore";
@@ -22,6 +22,17 @@ export const ProductsPage = () => {
     const totalPrice = useCartStore((state) => state.totalPrice());
     const [categoryName, setCategoryName] = useState('');
     const [categoryError, setCategoryError] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const visibleProducts = useMemo(() => {
+        const normalizedSearch = searchTerm.trim().toLowerCase();
+
+        if (!normalizedSearch) return products;
+
+        return products.filter((product) => {
+            const categoryName = product.category?.name ?? '';
+            return `${product.name} ${categoryName}`.toLowerCase().includes(normalizedSearch);
+        });
+    }, [products, searchTerm]);
 
     const handleCreateCategory: SubmitEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
@@ -56,6 +67,19 @@ export const ProductsPage = () => {
             {categoriesError && <p className="state state-error">Could not load categories: {categoriesError.message}</p>}
             {!loading && !error && products.length === 0 && <p className="state">No products yet.</p>}
 
+            <div className="product-tools" aria-label="Product filters">
+                <label className="form-field">
+                    <span>Search</span>
+                    <input
+                        className="task-input"
+                        type="search"
+                        value={searchTerm}
+                        placeholder="Search products"
+                        onChange={(event) => setSearchTerm(event.target.value)}
+                    />
+                </label>
+            </div>
+
             <section className="category-panel" aria-labelledby="categories-heading">
                 <div>
                     <h2 id="categories-heading">Categories</h2>
@@ -84,10 +108,13 @@ export const ProductsPage = () => {
                 onSubmit={createProduct}
             />
             <ul className="product-list">
-                {products.map((product) => (
+                {visibleProducts.map((product) => (
                     <ProductItem key={product.id} product={product} />
                 ))}
             </ul>
+            {!loading && !error && products.length > 0 && visibleProducts.length === 0 && (
+                <p className="state">No products match your search.</p>
+            )}
         </main>
     )
 }
