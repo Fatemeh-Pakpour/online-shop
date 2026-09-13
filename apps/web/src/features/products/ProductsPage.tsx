@@ -18,8 +18,11 @@ export const ProductsPage = () => {
         createProduct,
         createCategory,
     } = useProducts();
+    const cartItems = useCartStore((state) => state.items);
     const itemCount = useCartStore((state) => state.itemCount());
     const totalPrice = useCartStore((state) => state.totalPrice());
+    const removeCartItem = useCartStore((state) => state.removeItem);
+    const clearCart = useCartStore((state) => state.clearCart);
     const [categoryName, setCategoryName] = useState('');
     const [categoryError, setCategoryError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -81,8 +84,31 @@ export const ProductsPage = () => {
                     <p className="page-subtitle">{products.length} total</p>
                 </div>
                 <div className="cart-summary" aria-label="Cart summary">
-                    <span>{itemCount} in cart</span>
-                    <strong>{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(totalPrice)}</strong>
+                    <div>
+                        <span>{itemCount} in cart</span>
+                        <strong>{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(totalPrice)}</strong>
+                    </div>
+                    {cartItems.length > 0 && (
+                        <>
+                            <ul className="cart-items">
+                                {cartItems.map((item) => (
+                                    <li key={item.productId}>
+                                        <span>{item.name} x{item.quantity}</span>
+                                        <button
+                                            className="button button-ghost"
+                                            type="button"
+                                            onClick={() => removeCartItem(item.productId)}
+                                        >
+                                            Remove
+                                        </button>
+                                    </li>
+                                ))}
+                            </ul>
+                            <button className="button button-ghost" type="button" onClick={clearCart}>
+                                Clear cart
+                            </button>
+                        </>
+                    )}
                 </div>
             </header>
 

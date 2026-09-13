@@ -49,8 +49,8 @@ body {
 
 .cart-summary {
   display: grid;
-  gap: 0.15rem;
-  min-width: 8rem;
+  gap: 0.6rem;
+  min-width: 12rem;
   padding: 0.65rem 0.75rem;
   text-align: right;
   background: var(--surface);
@@ -64,7 +64,28 @@ body {
 }
 
 .cart-summary strong {
+  display: block;
   font-size: 1rem;
+}
+
+.cart-items {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cart-items li {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.cart-items span {
+  overflow-wrap: anywhere;
 }
 
 .task-form {
@@ -262,6 +283,10 @@ body {
 
   .cart-summary {
     text-align: left;
+  }
+
+  .cart-items li {
+    justify-content: space-between;
   }
 
   .task-form {
