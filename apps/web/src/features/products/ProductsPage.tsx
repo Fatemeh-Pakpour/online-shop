@@ -32,10 +32,18 @@ export const ProductsPage = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('all');
     const [sortMode, setSortMode] = useState('newest');
+    const [showSavedOnly, setShowSavedOnly] = useState(false);
     const visibleProducts = useMemo(() => {
         const normalizedSearch = searchTerm.trim().toLowerCase();
+        const savedProductIds = new Set(
+            wishlistItems.map((item) => item.productId),
+        );
 
         const filteredProducts = products.filter((product) => {
+            if (showSavedOnly && !savedProductIds.has(product.id)) {
+                return false;
+            }
+
             const matchesCategory =
                 categoryFilter === 'all' ||
                 (categoryFilter === 'uncategorized' && !product.categoryId) ||
@@ -63,7 +71,7 @@ export const ProductsPage = () => {
 
             return Date.parse(secondProduct.createdAt) - Date.parse(firstProduct.createdAt);
         });
-    }, [categoryFilter, products, searchTerm, sortMode]);
+    }, [categoryFilter, products, searchTerm, showSavedOnly, sortMode, wishlistItems]);
 
     const handleCreateCategory: SubmitEventHandler<HTMLFormElement> = (event) => {
         event.preventDefault();
@@ -152,6 +160,15 @@ export const ProductsPage = () => {
             {!loading && !error && products.length === 0 && <p className="state">No products yet.</p>}
 
             <div className="product-tools" aria-label="Product filters">
+                <label className="saved-toggle">
+                    <input
+                        type="checkbox"
+                        checked={showSavedOnly}
+                        disabled={wishlistItems.length === 0}
+                        onChange={(event) => setShowSavedOnly(event.target.checked)}
+                    />
+                    <span>Saved only</span>
+                </label>
                 <label className="form-field">
                     <span>Search</span>
                     <input
@@ -227,7 +244,9 @@ export const ProductsPage = () => {
                 ))}
             </ul>
             {!loading && !error && products.length > 0 && visibleProducts.length === 0 && (
-                <p className="state">No products match your search.</p>
+                <p className="state">
+                    {showSavedOnly ? 'No saved products match your filters.' : 'No products match your search.'}
+                </p>
             )}
         </main>
     )
