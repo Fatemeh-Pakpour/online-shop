@@ -23,7 +23,7 @@ body {
 }
 
 .page {
-  max-width: 640px;
+  max-width: 760px;
   margin: 0 auto;
   padding: 2rem 1rem 4rem;
 }
@@ -47,10 +47,16 @@ body {
   font-size: 0.9rem;
 }
 
-.cart-summary {
+.shop-summaries {
+  display: grid;
+  gap: 0.75rem;
+  min-width: min(24rem, 100%);
+}
+
+.cart-summary,
+.wishlist-summary {
   display: grid;
   gap: 0.6rem;
-  min-width: 12rem;
   padding: 0.65rem 0.75rem;
   text-align: right;
   background: var(--surface);
@@ -58,12 +64,14 @@ body {
   border-radius: 8px;
 }
 
-.cart-summary span {
+.cart-summary span,
+.wishlist-summary span {
   color: var(--muted);
   font-size: 0.85rem;
 }
 
-.cart-summary strong {
+.cart-summary strong,
+.wishlist-summary strong {
   display: block;
   font-size: 1rem;
 }
@@ -155,8 +163,32 @@ body {
 .product-tools {
   display: grid;
   gap: 0.75rem;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(8rem, 0.7fr) repeat(3, minmax(0, 1fr));
   margin: 1rem 0 1.25rem;
+}
+
+.saved-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.saved-toggle input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--accent);
+}
+
+.saved-toggle:has(input:checked) {
+  color: var(--text);
+  border-color: var(--accent);
 }
 
 .field-error {
@@ -185,6 +217,16 @@ body {
   background: transparent;
   color: var(--danger);
   padding: 0.35rem 0.7rem;
+}
+
+.button-secondary {
+  background: var(--surface);
+  color: var(--accent);
+  border: 1px solid var(--accent);
+}
+
+.button-secondary[aria-pressed='true'] {
+  background: color-mix(in srgb, var(--accent) 14%, var(--surface));
 }
 
 .state {
@@ -251,6 +293,10 @@ body {
   min-width: 0;
 }
 
+.product-item.is-wishlisted {
+  border-color: var(--accent);
+}
+
 .product-item h2 {
   margin: 0;
   font-size: 1rem;
@@ -264,6 +310,13 @@ body {
 
 .product-category {
   font-size: 0.85rem;
+}
+
+.product-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 @media (max-width: 520px) {
@@ -282,6 +335,10 @@ body {
   }
 
   .cart-summary {
+    text-align: left;
+  }
+
+  .wishlist-summary {
     text-align: left;
   }
 
@@ -308,6 +365,11 @@ body {
 
   .button {
     width: 100%;
+  }
+
+  .product-actions {
+    display: grid;
+    justify-content: stretch;
   }
 }
 
