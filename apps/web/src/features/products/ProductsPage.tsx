@@ -2,6 +2,7 @@ import { useMemo, useState, type SubmitEventHandler } from "react";
 
 import { ProductForm } from "../../components/Product/ProductForm";
 import { useCartStore } from "../../stores/cartStore";
+import { useWishlistStore } from "../../stores/wishlistStore";
 import { ProductItem } from "./productItem";
 import { useProducts } from "./useProducts"
 
@@ -23,6 +24,9 @@ export const ProductsPage = () => {
     const totalPrice = useCartStore((state) => state.totalPrice());
     const removeCartItem = useCartStore((state) => state.removeItem);
     const clearCart = useCartStore((state) => state.clearCart);
+    const wishlistItems = useWishlistStore((state) => state.items);
+    const removeWishlistItem = useWishlistStore((state) => state.removeItem);
+    const clearWishlist = useWishlistStore((state) => state.clearWishlist);
     const [categoryName, setCategoryName] = useState('');
     const [categoryError, setCategoryError] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
@@ -83,32 +87,62 @@ export const ProductsPage = () => {
                     <h1>Products</h1>
                     <p className="page-subtitle">{products.length} total</p>
                 </div>
-                <div className="cart-summary" aria-label="Cart summary">
-                    <div>
-                        <span>{itemCount} in cart</span>
-                        <strong>{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(totalPrice)}</strong>
+                <div className="shop-summaries">
+                    <div className="cart-summary" aria-label="Cart summary">
+                        <div>
+                            <span>{itemCount} in cart</span>
+                            <strong>{new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(totalPrice)}</strong>
+                        </div>
+                        {cartItems.length > 0 && (
+                            <>
+                                <ul className="cart-items">
+                                    {cartItems.map((item) => (
+                                        <li key={item.productId}>
+                                            <span>{item.name} x{item.quantity}</span>
+                                            <button
+                                                className="button button-ghost"
+                                                type="button"
+                                                onClick={() => removeCartItem(item.productId)}
+                                            >
+                                                Remove
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <button className="button button-ghost" type="button" onClick={clearCart}>
+                                    Clear cart
+                                </button>
+                            </>
+                        )}
                     </div>
-                    {cartItems.length > 0 && (
-                        <>
-                            <ul className="cart-items">
-                                {cartItems.map((item) => (
-                                    <li key={item.productId}>
-                                        <span>{item.name} x{item.quantity}</span>
-                                        <button
-                                            className="button button-ghost"
-                                            type="button"
-                                            onClick={() => removeCartItem(item.productId)}
-                                        >
-                                            Remove
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
-                            <button className="button button-ghost" type="button" onClick={clearCart}>
-                                Clear cart
-                            </button>
-                        </>
-                    )}
+
+                    <div className="wishlist-summary" aria-label="Wishlist summary">
+                        <div>
+                            <span>{wishlistItems.length} saved</span>
+                            <strong>Wishlist</strong>
+                        </div>
+                        {wishlistItems.length > 0 && (
+                            <>
+                                <ul className="cart-items">
+                                    {wishlistItems.map((item) => (
+                                        <li key={item.productId}>
+                                            <span>{item.name}</span>
+                                            <button
+                                                className="button button-ghost"
+                                                type="button"
+                                                onClick={() => removeWishlistItem(item.productId)}
+                                            >
+                                                Remove
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
+                                <button className="button button-ghost" type="button" onClick={clearWishlist}>
+                                    Clear wishlist
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
             </header>
 
